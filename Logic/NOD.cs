@@ -13,7 +13,7 @@ namespace Logic
         /// <param name="time">Time of execution program in milliseconds.</param>
         /// <param name="array">Array of parameters.</param>
         /// <returns>NOD of all parameters.</returns>
-        public static int Euclid(out int time, params int[] array)
+        public static int Euclid(out long time, params int[] array)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -23,7 +23,7 @@ namespace Logic
                 nod = Euclid(array[i], nod);
             }
             stopwatch.Stop();
-            time = stopwatch.Elapsed.Milliseconds;
+            time = stopwatch.ElapsedMilliseconds;
             return nod;
         }
 
@@ -54,9 +54,10 @@ namespace Logic
         /// <summary>
         /// Finds NOD using Stein method.
         /// </summary>
+        /// <param name="time">Time of execution program in milliseconds.</param>
         /// <param name="array">Array of parameters.</param>
         /// <returns>NOD of all parameters.</returns>
-        public static int Stein(out int time, params int[] array)
+        public static int Stein(out long time, params int[] array)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -66,7 +67,7 @@ namespace Logic
                 nod = Stein(array[i], nod);
             }
             stopwatch.Stop();
-            time = stopwatch.Elapsed.Milliseconds;
+            time = stopwatch.ElapsedMilliseconds;
             return nod;
         }
 

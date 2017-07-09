@@ -23,7 +23,7 @@ namespace Logic.NUnitTests
         [TestCase(0,0,0,0,0, ExpectedResult = 0)]
         public int Euclid_CorrectValues_PositiveTest(params int[] array)
         { 
-            int time;
+            long time;
             return Nod.Euclid(out time, array);
         }
         #endregion
@@ -44,7 +44,7 @@ namespace Logic.NUnitTests
         [TestCase(0, 0, 0, 0, 0, ExpectedResult = 0)]
         public int Stein_CorrectValues_PositiveTest(params int[] array)
         {
-            int time;
+            long time;
             return Nod.Stein(out time, array);
         }
         #endregion
