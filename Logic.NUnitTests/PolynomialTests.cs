@@ -87,6 +87,7 @@ namespace Logic.NUnitTests
         [TestCase(new double[] { 2, 0, 1 }, new double[] { 2, 0, 1 })]
         [TestCase(new double[] { 0, 0, 1 }, new double[] { 0, 0, 1 })]
         [TestCase(new double[] { 0, 0, 0 }, new double[] { 0, 0, 0 })]
+        [TestCase(new double[] { 0, 0 }, new double[] { 0, 0, 0 })]
         public void OperatorEqual_True_PositiveTest(double[] array1, double[] array2)
         {
             Polynomial p1 = new Polynomial(array1);
@@ -96,7 +97,6 @@ namespace Logic.NUnitTests
 
         [TestCase(new double[] { 2, 0, 1 }, new double[] { 2, 0 })]
         [TestCase(new double[] { 0, 0, 1 }, new double[] { 0, 0, 2 })]
-        [TestCase(new double[] { 0, 0 }, new double[] { 0, 0, 0 })]
         public void OperatorEqual_False_PositiveTest(double[] array1, double[] array2)
         {
             Polynomial p1 = new Polynomial(array1);

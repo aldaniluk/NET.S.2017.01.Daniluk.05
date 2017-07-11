@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,106 +15,32 @@ namespace Logic
         /// </summary>
         /// <param name="number">Double number to be converted.</param>
         /// <returns>String of bits.</returns>
-        public static string ContertToBits (this double number)
-        { 
-            bool[] bits = new bool[64];
+        public static string DoubleToBits(this double number)
+        {
+            NumberUnion union = new NumberUnion();
+            union.dNumber = number;
 
-            PutSign(number, bits);
+            StringBuilder result = new StringBuilder();
 
-            double n = Math.Abs(number);
-
-            bool[] mantissa = new bool[53];
-            int index = GetMantissa(n, mantissa);
-
-
-            int order = 0;
-            for (int i = 0; i < mantissa.Length; i++)
+            for (int i = 0; i < 64; i++)
             {
-                if (mantissa[i] == true)
-                {
-                    order = index - i - 1;
-                    break;
-                }
+                result.Append(((union.lNumber & 1) == 1) ? "1" : "0");
+                union.lNumber >>= 1;
             }
 
-            order += 1023;
-            BitArray orderArr = new BitArray(new int[] { order });
+            char[] resultArray = result.ToString().ToCharArray();
+            Array.Reverse(resultArray);
 
-            int j = 0;
-            for (int i = 11; i >= 1; i--, j++)
-            {
-                bits[i] = orderArr[j];
-            }
-            for (int i = 12; i < bits.Length; i++)
-            {
-                bits[i] = mantissa[i - 11];
-            }
-
-            return ConvertBoolArrToString(bits);
+            return new string(resultArray);
         }
 
-        private static void PutSign(double number, bool[] bits)
+        [StructLayout(LayoutKind.Explicit)]
+        private struct NumberUnion
         {
-            if (number > 0)
-            {
-                bits[0] = false;
-            }
-            else
-            {
-                bits[0] = true;
-            }
-        }
-
-        private static int GetMantissa(double n, bool[] mantissa)
-        {
-            //for int part of a number
-            BitArray intPartArr = new BitArray(new int[] { (int)n });
-            int index = 0;
-            for (int i = intPartArr.Length - 1; i >= 0; i--)
-            {
-                if (intPartArr[i] == true)
-                {
-
-                    for (int ii = i; ii >= 0; ii--, index++)
-                    {
-                        mantissa[index] = intPartArr[ii];
-                    }
-                    break;
-                }
-            }
-
-            //for decimal part
-            for (int i = index; i < mantissa.Length; i++)
-            {
-                if ((n * 2 - ((int)n) * 2) >= 1)
-                {
-                    mantissa[i] = true;
-                }
-                else
-                {
-                    mantissa[i] = false;
-                }
-                n *= 2;
-                n -= (int)n;
-            }
-            return index;
-        }
-
-        private static string ConvertBoolArrToString(bool[] arr)
-        {
-            byte[] result = new byte[64];
-            for (int i = 0; i < result.Length; i++)
-            {
-                if (arr[i])
-                {
-                    result[i] = 1;
-                }
-                else
-                {
-                    result[i] = 0;
-                }
-            }
-            return string.Join("", result);
+            [FieldOffset(0)]
+            public double dNumber;
+            [FieldOffset(0)]
+            public long lNumber;
         }
     }
 }

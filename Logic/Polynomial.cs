@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Logic
 {
-    public class Polynomial
+    public sealed class Polynomial : ICloneable, IEquatable<Polynomial>
     {
         #region public fields
         /// <summary>
@@ -17,10 +19,8 @@ namespace Logic
         #endregion
 
         #region private fields
-        /// <summary>
-        /// Array of coefficients.
-        /// </summary>
-        private СoefficientArray coefficientArray;
+        private readonly СoefficientArray coefficientArray;
+        private static double Eps { get; }
         #endregion
 
         #region struct СoefficientArray
@@ -34,10 +34,18 @@ namespace Logic
 
             public СoefficientArray(params double[] inputArray)
             {
-                array = new double[inputArray.Length];
+                int index;
+                for(index = inputArray.Length - 1; index >= 0; index--)
+                {
+                    if (inputArray[index] != 0) break;
+                }
+                array = new double[index + 1];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = inputArray[i];
+                    if (inputArray[i] >= Eps)
+                    {
+                        array[i] = inputArray[i];
+                    }
                 }
                 Length = array.Length;
             }
@@ -53,7 +61,7 @@ namespace Logic
             {
                 get
                 {
-                    if(i < 0 || i >= Length) throw new ArgumentOutOfRangeException(nameof(i));
+                    if (i < 0 || i >= Length) throw new ArgumentOutOfRangeException(nameof(i));
                     return array[i];
                 }
             }
@@ -84,6 +92,12 @@ namespace Logic
 
             coefficientArray = new СoefficientArray(polynomial.coefficientArray.GetArray());
             Degree = coefficientArray.Length - 1;
+        }
+
+        static Polynomial()
+        {
+            //Eps = 0.0001;
+            Eps = double.Parse(ConfigurationManager.AppSettings["eps"], CultureInfo.InvariantCulture);
         }
         #endregion
 
@@ -119,9 +133,14 @@ namespace Logic
             if (ReferenceEquals(obj, this)) return true;
             return Equals(obj as Polynomial);
         }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
         #endregion
 
-        #region overloaded operators
+        #region overloaded operators +,-,*,==,!=
         /// <summary>
         /// Finds the sum of two polynomials.
         /// </summary>
@@ -233,6 +252,32 @@ namespace Logic
         }
         #endregion
 
+        #region Add, Subtract, Multiply
+        /// <summary>
+        /// Finds the sum of two polynomials.
+        /// </summary>
+        /// <param name="polynomial1">First polynomial.</param>
+        /// <param name="polynomial2">Second polynomial.</param>
+        /// <returns>Sum of two polynomials.</returns>
+        public static Polynomial Add(Polynomial polynomial1, Polynomial polynomial2) => polynomial1 + polynomial2;
+
+        /// <summary>
+        /// Finds the difference of two polynomials.
+        /// </summary>
+        /// <param name="polynomial1">First polynomial.</param>
+        /// <param name="polynomial2">Second polynomial.</param>
+        /// <returns>Difference of two polynomials.</returns>
+        public static Polynomial Subtract(Polynomial polynomial1, Polynomial polynomial2) => polynomial1 - polynomial2;
+
+        /// <summary>
+        /// Multiplies two polynomials.
+        /// </summary>
+        /// <param name="polynomial1">First polynomial.</param>
+        /// <param name="polynomial2">Second polynomial.</param>
+        /// <returns>Multiplying of two polynomials.</returns>
+        public static Polynomial Multiply(Polynomial polynomial1, Polynomial polynomial2) => polynomial1 * polynomial2;
+        #endregion
+
         /// <summary>
         /// Checks for equality.
         /// </summary>
@@ -258,6 +303,15 @@ namespace Logic
                 result += this.coefficientArray[i] * Math.Pow(value, i);
             }
             return result;
+        }
+
+        object ICloneable.Clone()
+        {
+            return (object)new Polynomial(this.coefficientArray.GetArray());
+        }
+        public Polynomial Clone()
+        {
+            return new Polynomial(this.coefficientArray.GetArray());
         }
         #endregion
 
